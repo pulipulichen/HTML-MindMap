@@ -4,12 +4,30 @@ async function downloadImage() {
     // 為了確保完整捕捉，我們先滾動到最上方
     const canvas = await html2canvas(area, {
         backgroundColor: "rgba(255,255,255,0)",
-        scale: 3,
+        scale: 2,
         logging: false,
         useCORS: true
     });
+
+    // 取得檔名：輸入文字第一行 + YYYYMMDD-HHmmSS
+    const textInput = document.getElementById('textInput');
+    let firstLine = '心智圖';
+    if (textInput && textInput.value.trim()) {
+        firstLine = textInput.value.trim().split('\n')[0].substring(0, 50).trim();
+        // 過濾掉檔案系統不允許的字元
+        firstLine = firstLine.replace(/[\\/:*?"<>|]/g, '_');
+    }
+
+    const now = new Date();
+    const timestamp = now.getFullYear() +
+        String(now.getMonth() + 1).padStart(2, '0') +
+        String(now.getDate()).padStart(2, '0') + '-' +
+        String(now.getHours()).padStart(2, '0') +
+        String(now.getMinutes()).padStart(2, '0') +
+        String(now.getSeconds()).padStart(2, '0');
+
     const link = document.createElement('a');
-    link.download = '心智圖.png';
+    link.download = `${firstLine}-${timestamp}.png`;
     link.href = canvas.toDataURL('image/png');
     link.click();
 }
@@ -20,7 +38,7 @@ async function copyImageToClipboard() {
         const canvas = await html2canvas(area, {
             // backgroundColor: '#000000',
             backgroundColor: "rgba(255,255,255,0)",
-            scale: 3
+            scale: 2
         });
         
         canvas.toBlob(async (blob) => {

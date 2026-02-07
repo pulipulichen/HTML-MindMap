@@ -23,16 +23,15 @@ function trimCanvas(canvas) {
         return canvas; // Empty canvas
     }
 
-    // 增加間距使匯出圖片與預覽畫面的一致
-    // 預覽區上方有 60px padding，兩側有 20px padding
-    // 因為 html2canvas 使用 scale: 2，所以對應的間距也要加倍
-    const paddingX = 40; // 20px * 2
-    const paddingY = 120; // 60px * 2
+    const paddingX = 0;
+    const paddingY = 0;
 
     minX = Math.max(0, minX - paddingX);
     minY = Math.max(0, minY - paddingY);
     maxX = Math.min(width, maxX + paddingX);
     maxY = Math.min(height, maxY + paddingY);
+
+    console.log({ minX, minY, maxX, maxY })
 
     const trimmedWidth = maxX - minX;
     const trimmedHeight = maxY - minY;

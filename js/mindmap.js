@@ -39,6 +39,7 @@ function renderMindMap() {
     rootNode.className = 'node node-root mb-20';
     rootNode.textContent = data.text;
     rootNode.id = 'root-node';
+    rootNode.style.paddingTop = '0px';
     renderRoot.appendChild(rootNode);
 
     // 建立 Level 1 Container (Horizontal)
@@ -55,6 +56,7 @@ function renderMindMap() {
         l1Node.className = `node node-level1 color-${index % 4}`;
         l1Node.textContent = child.text;
         l1Node.id = `node-l1-${index}`;
+        l1Node.style.paddingTop = '0px';
         column.appendChild(l1Node);
 
         // L2 Container (Vertical)
@@ -67,6 +69,7 @@ function renderMindMap() {
                 l2Node.className = 'node node-level2';
                 l2Node.textContent = subChild.text;
                 l2Node.id = `node-l1-${index}-l2-${subIndex}`;
+                l2Node.style.paddingTop = '0px';
                 l2List.appendChild(l2Node);
             });
             column.appendChild(l2List);

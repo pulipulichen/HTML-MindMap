@@ -30,6 +30,7 @@ body {
     /* box-shadow: 0 4px 15px rgba(0,0,0,0.3); */
     white-space: pre-wrap;
     line-height: 1.4;
+    padding-top: 0px !important;
 }
 
 .node-root {
@@ -41,6 +42,10 @@ body {
 .node-level1 {
     border-width: 3px;
     font-size: 1.1rem;
+}
+
+#renderRoot .node-level1 {
+    padding-top: 12px !important;
 }
 
 .node-level2 {

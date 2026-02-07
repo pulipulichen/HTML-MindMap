@@ -27,7 +27,7 @@ test('應該能正常載入頁面並顯示心智圖', async ({ page }) => {
   await page.waitForTimeout(500);
 
   // 檢查是否有節點被產生 (根據 script.js 的邏輯，應該會產生 .node-item)
-  const nodes = page.locator('.node-item');
+  const nodes = page.locator('.node');
   const count = await nodes.count();
   expect(count).toBeGreaterThan(0);
 

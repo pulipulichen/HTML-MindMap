@@ -93,6 +93,17 @@
 
     <!-- 右側預覽區 -->
     <div class="flex-1 overflow-auto bg-white scroll-custom relative">
+        <!-- 即時預覽結果 (html2canvas) -->
+        <div id="previewContainer" class="fixed top-4 right-4 z-50 w-64 border-2 border-blue-500 rounded-lg shadow-2xl bg-white overflow-hidden pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-100">
+            <div class="bg-blue-500 text-white text-[10px] px-2 py-1 flex justify-between items-center">
+                <span>即時預覽 (Canvas)</span>
+                <span id="previewStatus" class="w-2 h-2 rounded-full bg-green-400"></span>
+            </div>
+            <div id="previewOutput" class="p-1 flex items-center justify-center bg-gray-50 min-h-[100px]">
+                <span class="text-gray-400 text-[10px]">正在生成預覽...</span>
+            </div>
+        </div>
+
         <div id="captureArea" class="mindmap-container w-full min-w-[800px]">
             <svg id="svgConnectors" class="connector-svg"></svg>
             <div id="renderRoot" class="w-full flex flex-col items-center">

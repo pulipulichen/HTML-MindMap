@@ -109,3 +109,51 @@ async function copyImageToClipboard() {
         console.error("複製失敗", err);
     }
 }
+
+// 即時預覽功能
+let previewTimer = null;
+async function updatePreview() {
+    const previewStatus = document.getElementById('previewStatus');
+    const previewOutput = document.getElementById('previewOutput');
+    const previewContainer = document.getElementById('previewContainer');
+
+    if (!previewStatus || !previewOutput || !previewContainer) return;
+
+    // 顯示預覽區域
+    previewContainer.classList.remove('opacity-0');
+    previewContainer.classList.add('opacity-100');
+
+    // Debounce: 避免頻繁渲染
+    if (previewTimer) clearTimeout(previewTimer);
+
+    previewTimer = setTimeout(async () => {
+        try {
+            previewStatus.classList.remove('bg-green-400');
+            previewStatus.classList.add('bg-yellow-400');
+
+            const area = document.getElementById('captureArea');
+            const canvas = await html2canvas(area, {
+                backgroundColor: null,
+                scale: 1, // 預覽用 1 倍即可，兼顧效能
+                logging: false,
+                useCORS: true
+            });
+
+            const trimmedCanvas = trimCanvas(canvas);
+
+            // 更新預覽顯示
+            previewOutput.innerHTML = '';
+            const img = new Image();
+            img.src = trimmedCanvas.toDataURL('image/png');
+            img.className = 'max-w-full max-h-[300px] object-contain shadow-sm';
+            previewOutput.appendChild(img);
+
+            previewStatus.classList.remove('bg-yellow-400');
+            previewStatus.classList.add('bg-green-400');
+        } catch (err) {
+            console.error("預覽生成失敗", err);
+            previewStatus.classList.remove('bg-yellow-400', 'bg-green-400');
+            previewStatus.classList.add('bg-red-400');
+        }
+    }, 800); // 800ms 的延遲，確保用戶停止輸入後再渲染
+}

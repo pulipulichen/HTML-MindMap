@@ -133,8 +133,24 @@ function drawConnectors(data) {
 }
 
 // 事件監聽
-textInput.addEventListener('input', renderMindMap);
-window.addEventListener('resize', renderMindMap);
+textInput.addEventListener('input', () => {
+    renderMindMap();
+    if (typeof updatePreview === 'function') {
+        updatePreview();
+    }
+});
+
+window.addEventListener('resize', () => {
+    renderMindMap();
+    if (typeof updatePreview === 'function') {
+        updatePreview();
+    }
+});
 
 // 初始渲染
-window.onload = renderMindMap;
+window.onload = () => {
+    renderMindMap();
+    if (typeof updatePreview === 'function') {
+        updatePreview();
+    }
+};

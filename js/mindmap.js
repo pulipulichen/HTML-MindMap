@@ -49,7 +49,7 @@ function renderMindMap() {
 
     data.children.forEach((child, index) => {
         const column = document.createElement('div');
-        column.className = 'flex flex-col items-center flex-1 max-w-[250px]';
+        column.className = 'flex flex-col items-center flex-1 min-w-[150px] max-w-[300px]';
 
         // L1 Node
         const l1Node = document.createElement('div');

@@ -53,7 +53,7 @@ function renderMindMap() {
 
         // L1 Node
         const l1Node = document.createElement('div');
-        l1Node.className = `node node-level1 color-${index % 4}`;
+        l1Node.className = `node node-level1 color-${index % colors.length}`;
         l1Node.textContent = child.text;
         l1Node.id = `node-l1-${index}`;
         l1Node.style.paddingTop = '0px';

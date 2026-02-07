@@ -3,71 +3,103 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>垂直心智圖繪製工具</title>
+    <title>垂直心智圖產生器</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap');
         
         body {
             font-family: 'Noto Sans TC', sans-serif;
-            background-color: #f1f5f9;
+            background-color: #1a1a1a;
+            color: white;
+            overflow-x: hidden;
         }
 
-        .canvas-container {
-            overflow: auto;
-            background-image: radial-gradient(#cbd5e1 1px, transparent 1px);
-            background-size: 30px 30px;
+        .mindmap-container {
+            background-color: #FFFFF;
+            min-height: 600px;
+            padding: 60px 20px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
         }
 
-        #mindmap-svg {
-            display: block;
-            margin: auto;
+        .node {
             background: white;
-            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-            border-radius: 8px;
+            color: #333;
+            padding: 12px 24px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: bold;
+            font-size: 1.25rem;
+            z-index: 10;
+            border: 2px solid transparent;
+            /* box-shadow: 0 4px 15px rgba(0,0,0,0.3); */
+            white-space: pre-wrap;
+            line-height: 1.4;
         }
 
-        textarea {
-            font-family: 'Courier New', Courier, monospace;
-            line-height: 1.6;
+        .node-root {
+            font-size: 2rem;
+            padding: 20px 40px;
+            border-color: #cbd5e1;
         }
+
+        .node-level1 {
+            border-width: 3px;
+            font-size: 1.1rem;
+        }
+
+        .node-level2 {
+            background: transparent;
+            color: #888;
+            font-weight: normal;
+            font-size: 1rem;
+            padding: 8px 0;
+            box-shadow: none;
+        }
+
+        .connector-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .scroll-custom::-webkit-scrollbar {
+            width: 8px;
+        }
+        .scroll-custom::-webkit-scrollbar-track {
+            background: #2d2d2d;
+        }
+        .scroll-custom::-webkit-scrollbar-thumb {
+            background: #4a4a4a;
+            border-radius: 4px;
+        }
+
+        /* 第一層顏色循環 */
+        .color-0 { border-color: #f87171; color: #1a1a1a; } /* 紅 */
+        .color-1 { border-color: #fbbf24; color: #1a1a1a; } /* 橘 */
+        .color-2 { border-color: #4ade80; color: #1a1a1a; } /* 綠 */
+        .color-3 { border-color: #60a5fa; color: #1a1a1a; } /* 藍 */
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- Header -->
-    <header class="bg-white border-b px-6 py-3 flex justify-between items-center shrink-0">
-        <div class="flex items-center gap-3">
-            <div class="p-2 bg-indigo-50 rounded-lg">
-                <svg xmlns="http://www.w3.org/2000/svg" class="w-6 h-6 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                </svg>
-            </div>
-            <div>
-                <h1 class="text-lg font-bold text-gray-800 leading-tight">垂直心智圖繪製器 v2</h1>
-                <p class="text-xs text-gray-500">支援多層級遞迴垂直架構</p>
-            </div>
-        </div>
-        <button id="download-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2 rounded-full font-medium flex items-center gap-2 transition-all active:scale-95 shadow-lg shadow-indigo-200">
-            <svg xmlns="http://www.w3.org/2000/svg" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a2 2 0 002 2h12a2 2 0 002-2v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
-            </svg>
-            導出高清 PNG
-        </button>
-    </header>
-
-    <main class="flex flex-1 overflow-hidden">
-        <!-- Sidebar -->
-        <div class="w-84 border-r bg-white p-5 flex flex-col gap-4 shrink-0 shadow-sm">
-            <div class="flex-1 flex flex-col min-h-0">
-                <label class="block text-sm font-bold text-gray-700 mb-2 flex items-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4 text-gray-400" viewBox="0 0 20 20" fill="currentColor">
-                        <path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" />
-                        <path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" />
-                    </svg>
-                    結構化輸入
-                </label>
-                <textarea id="input-text" class="flex-1 w-full p-4 bg-gray-50 border border-gray-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:outline-none text-sm leading-relaxed" spellcheck="false">訪談分析
+    <!-- 左側編輯區 -->
+    <div class="w-full md:w-1/3 bg-neutral-900 p-6 flex flex-col border-r border-neutral-800">
+        <h1 class="text-xl font-bold mb-4 flex items-center gap-2">
+            <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 12h6"/><path d="M12 9v6"/><path d="M12 3v18"/><path d="M3 12h18"/></svg>
+            垂直心智圖產生器
+        </h1>
+        
+        <p class="text-xs text-neutral-400 mb-2">請依照下列格式輸入（支援 \n 換行）：</p>
+        <textarea id="textInput" class="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 scroll-custom" spellcheck="false">訪談分析
 - 實作：\n訪談轉錄
   - 訪談準備
   - 開啟轉錄
@@ -75,293 +107,227 @@
 - 資料分析\n與RAG
   - 語音轉錄的限制
   - 檢索增強生成RAG
-    - 這裡可以有下一層
-    - 更多測試
   - Google\nNotebookLM
 - 實作：\n用RAG分析訪談
   - 建立筆記本
   - 訪談分析提示詞
   - 觀察分析結果</textarea>
-            </div>
-            <div class="bg-indigo-50 p-3 rounded-lg border border-indigo-100">
-                <h4 class="text-xs font-bold text-indigo-800 mb-1">多層級支援：</h4>
-                <p class="text-[11px] text-indigo-600 leading-normal">
-                    增加縮排（兩個空格）即可產生下一層細項。所有細項會以垂直線貫穿銜接，完美還原學術海報風格。
-                </p>
+
+        <div class="mt-4 flex gap-2">
+            <button onclick="downloadImage()" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                下載 PNG
+            </button>
+            <button id="copyBtn" onclick="copyImageToClipboard()" class="flex-1 bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
+                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect width="14" height="14" x="8" y="8" rx="2" ry="2"/><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"/></svg>
+                複製圖片
+            </button>
+        </div>
+        <div id="toast" class="fixed bottom-4 left-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity pointer-events-none">已複製到剪貼簿！</div>
+    </div>
+
+    <!-- 右側預覽區 -->
+    <div class="flex-1 overflow-auto bg-white scroll-custom relative">
+        <div id="captureArea" class="mindmap-container w-full min-w-[800px]">
+            <svg id="svgConnectors" class="connector-svg"></svg>
+            <div id="renderRoot" class="w-full flex flex-col items-center">
+                <!-- 內容會由 JS 產生 -->
             </div>
         </div>
-
-        <!-- Canvas -->
-        <div class="flex-1 canvas-container p-12 flex items-start justify-center">
-            <svg id="mindmap-svg" xmlns="http://www.w3.org/2000/svg"></svg>
-        </div>
-    </main>
-
-    <canvas id="export-canvas" class="hidden"></canvas>
+    </div>
 
     <script>
-        const inputTextArea = document.getElementById('input-text');
-        const svgElement = document.getElementById('mindmap-svg');
-        const downloadBtn = document.getElementById('download-btn');
+        const textInput = document.getElementById('textInput');
+        const renderRoot = document.getElementById('renderRoot');
+        const svgConnectors = document.getElementById('svgConnectors');
+        const colors = ['#f87171', '#fbbf24', '#4ade80', '#60a5fa', '#a78bfa', '#f472b6'];
 
-        const branchColors = ['#ff7e67', '#ffb703', '#70c167'];
-
-        function parseInput(text) {
-            const lines = text.split('\n').filter(l => l.trim());
+        function parseText(text) {
+            const lines = text.split('\n').filter(l => l.trim() !== '');
             if (lines.length === 0) return null;
 
-            const root = { text: lines[0].trim(), children: [], depth: 0 };
-            const stack = [root];
+            const root = { text: lines[0].replace(/\\n/g, '\n'), children: [] };
+            let currentLevel1 = null;
 
             for (let i = 1; i < lines.length; i++) {
                 const line = lines[i];
-                const indent = line.search(/\S/);
-                const content = line.trim().replace(/^-\s*/, '');
+                const content = line.trim().substring(2).replace(/\\n/g, '\n');
                 
-                // 每個層級預設為 2 個空格
-                const depth = Math.floor(indent / 2) + 1;
-                const node = { text: content, children: [], depth: depth };
-
-                while (stack.length > depth) {
-                    stack.pop();
-                }
-                
-                if (stack.length > 0) {
-                    stack[stack.length - 1].children.push(node);
-                    stack.push(node);
+                if (line.startsWith('- ')) {
+                    currentLevel1 = { text: content, children: [], id: `l1-${root.children.length}` };
+                    root.children.push(currentLevel1);
+                } else if (line.startsWith('  - ')) {
+                    if (currentLevel1) {
+                        currentLevel1.children.push({ text: content });
+                    }
                 }
             }
             return root;
         }
 
-        function getTextMetrics(text, fontSize) {
-            const lines = text.split('\\n');
-            const lineHeight = fontSize * 1.3;
-            return {
-                lines,
-                totalHeight: lines.length * lineHeight,
-                lineHeight
-            };
-        }
-
-        function createText(x, y, text, fontSize, fontWeight, color, align = 'middle') {
-            const { lines, lineHeight } = getTextMetrics(text, fontSize);
-            const g = document.createElementNS('http://www.w3.org/2000/svg', 'g');
-            
-            lines.forEach((line, i) => {
-                const t = document.createElementNS('http://www.w3.org/2000/svg', 'text');
-                t.setAttribute('x', x);
-                t.setAttribute('y', y + (i * lineHeight));
-                t.setAttribute('text-anchor', align);
-                t.setAttribute('font-size', fontSize);
-                t.setAttribute('font-weight', fontWeight);
-                t.setAttribute('fill', color);
-                t.style.fontFamily = "'Noto Sans TC', sans-serif";
-                t.textContent = line;
-                g.appendChild(t);
-            });
-            
-            return g;
-        }
-
-        // 遞迴計算分支所需的總高度
-        function calculateSubtreeHeight(node, config) {
-            let height = config.itemGap;
-            const metrics = getTextMetrics(node.text, config.fontSize);
-            height += metrics.totalHeight;
-
-            if (node.children && node.children.length > 0) {
-                node.children.forEach(child => {
-                    height += calculateSubtreeHeight(child, config);
-                });
-            }
-            return height;
-        }
-
-        function renderVerticalChain(node, x, startY, color, config) {
-            const metrics = getTextMetrics(node.text, config.fontSize);
-            
-            // 繪製文字
-            svgElement.appendChild(createText(x, startY, node.text, config.fontSize, '400', '#475569'));
-
-            let currentY = startY + metrics.totalHeight - (config.fontSize * 0.3); // 修正文字底部位置
-
-            if (node.children && node.children.length > 0) {
-                node.children.forEach((child, index) => {
-                    const nextStartY = currentY + config.itemGap;
-                    
-                    // 繪製連接線
-                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    line.setAttribute('x1', x);
-                    line.setAttribute('y1', currentY + 12);
-                    line.setAttribute('x2', x);
-                    line.setAttribute('y2', nextStartY - 18);
-                    line.setAttribute('stroke', color);
-                    line.setAttribute('stroke-width', '4');
-                    svgElement.appendChild(line);
-
-                    // 遞迴繪製子節點
-                    currentY = renderVerticalChain(child, x, nextStartY, color, config);
-                });
-            }
-            return currentY;
-        }
-
-        function render() {
-            const data = parseInput(inputTextArea.value);
+        function renderMindMap() {
+            const data = parseText(textInput.value);
             if (!data) return;
 
-            while (svgElement.firstChild) {
-                svgElement.removeChild(svgElement.firstChild);
-            }
+            // 清空舊內容
+            renderRoot.innerHTML = '';
+            svgConnectors.innerHTML = '';
 
-            const config = {
-                paddingX: 100,
-                paddingTop: 60,
-                paddingBottom: 100,
-                rootBoxH: 85,
-                trunkLen: 50,
-                level1Y: 320,
-                level1BoxW: 200,
-                level1BoxH: 110,
-                level2StartY: 480,
-                itemGap: 65,
-                fontSize: 20,
-                columnGap: 300
-            };
+            // 建立 Root
+            const rootNode = document.createElement('div');
+            rootNode.className = 'node node-root mb-20';
+            rootNode.textContent = data.text;
+            rootNode.id = 'root-node';
+            renderRoot.appendChild(rootNode);
 
-            // 動態計算 SVG 高度
-            let maxChainHeight = 0;
-            data.children.forEach(child => {
-                let h = 0;
-                const traverse = (n) => {
-                    h += config.itemGap + getTextMetrics(n.text, config.fontSize).totalHeight;
-                    n.children.forEach(traverse);
-                };
-                child.children.forEach(traverse);
-                if (h > maxChainHeight) maxChainHeight = h;
-            });
-
-            const totalWidth = Math.max(1000, data.children.length * config.columnGap + config.paddingX * 2);
-            const totalHeight = config.level2StartY + maxChainHeight + config.paddingBottom;
-
-            svgElement.setAttribute('width', totalWidth);
-            svgElement.setAttribute('height', totalHeight);
-            svgElement.setAttribute('viewBox', `0 0 ${totalWidth} ${totalHeight}`);
-
-            const centerX = totalWidth / 2;
-
-            // 1. Root Box
-            const rootBoxW = 280;
-            const rootRect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-            rootRect.setAttribute('x', centerX - rootBoxW / 2);
-            rootRect.setAttribute('y', config.paddingTop);
-            rootRect.setAttribute('width', rootBoxW);
-            rootRect.setAttribute('height', config.rootBoxH);
-            rootRect.setAttribute('rx', 15);
-            rootRect.setAttribute('fill', 'white');
-            rootRect.setAttribute('stroke', '#8e9aaf');
-            rootRect.setAttribute('stroke-width', '4');
-            svgElement.appendChild(rootRect);
-
-            svgElement.appendChild(createText(centerX, config.paddingTop + 55, data.text, 42, '700', '#334155'));
-
-            // 綠色主幹
-            const trunkStartY = config.paddingTop + config.rootBoxH;
-            const trunkSplitY = trunkStartY + config.trunkLen;
-            const trunkLine = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-            trunkLine.setAttribute('x1', centerX);
-            trunkLine.setAttribute('y1', trunkStartY);
-            trunkLine.setAttribute('x2', centerX);
-            trunkLine.setAttribute('y2', trunkSplitY);
-            trunkLine.setAttribute('stroke', '#70c167');
-            trunkLine.setAttribute('stroke-width', '16');
-            svgElement.appendChild(trunkLine);
-
-            // 2. 第一層 Box 與遞迴垂直鏈
-            const startX = centerX - ((data.children.length - 1) * config.columnGap) / 2;
+            // 建立 Level 1 Container (Horizontal)
+            const l1Container = document.createElement('div');
+            l1Container.className = 'flex justify-center gap-12 w-full px-10 items-start';
+            renderRoot.appendChild(l1Container);
 
             data.children.forEach((child, index) => {
-                const x = startX + index * config.columnGap;
-                const color = branchColors[index % branchColors.length];
+                const column = document.createElement('div');
+                column.className = 'flex flex-col items-center flex-1 max-w-[250px]';
+                
+                // L1 Node
+                const l1Node = document.createElement('div');
+                l1Node.className = `node node-level1 color-${index % 4}`;
+                l1Node.textContent = child.text;
+                l1Node.id = `node-l1-${index}`;
+                column.appendChild(l1Node);
 
-                // 分叉曲線
-                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-                const d = `M ${centerX} ${trunkSplitY} C ${centerX} ${trunkSplitY + 50}, ${x} ${config.level1Y - 120}, ${x} ${config.level1Y}`;
-                path.setAttribute('d', d);
-                path.setAttribute('fill', 'none');
-                path.setAttribute('stroke', color);
-                path.setAttribute('stroke-width', '8');
-                svgElement.appendChild(path);
-
-                // Level 1 Box
-                const l1Rect = document.createElementNS('http://www.w3.org/2000/svg', 'rect');
-                l1Rect.setAttribute('x', x - config.level1BoxW / 2);
-                l1Rect.setAttribute('y', config.level1Y);
-                l1Rect.setAttribute('width', config.level1BoxW);
-                l1Rect.setAttribute('height', config.level1BoxH);
-                l1Rect.setAttribute('rx', 12);
-                l1Rect.setAttribute('fill', 'white');
-                l1Rect.setAttribute('stroke', color);
-                l1Rect.setAttribute('stroke-width', '5');
-                svgElement.appendChild(l1Rect);
-
-                const l1FontSize = 24;
-                const l1Metrics = getTextMetrics(child.text, l1FontSize);
-                svgElement.appendChild(createText(x, config.level1Y + (config.level1BoxH - l1Metrics.totalHeight)/2 + l1FontSize * 0.7, child.text, l1FontSize, '500', '#1e293b'));
-
-                // 垂直連線與遞迴細項
+                // L2 Container (Vertical)
                 if (child.children.length > 0) {
-                    // 從 Box 底出的第一段線
-                    const firstSeg = document.createElementNS('http://www.w3.org/2000/svg', 'line');
-                    firstSeg.setAttribute('x1', x);
-                    firstSeg.setAttribute('y1', config.level1Y + config.level1BoxH);
-                    firstSeg.setAttribute('x2', x);
-                    firstSeg.setAttribute('y2', config.level2StartY - 20);
-                    firstSeg.setAttribute('stroke', color);
-                    firstSeg.setAttribute('stroke-width', '4');
-                    svgElement.appendChild(firstSeg);
-
-                    // 遞迴渲染所有後續層級
-                    let currentY = config.level2StartY;
-                    child.children.forEach(subChild => {
-                        currentY = renderVerticalChain(subChild, x, currentY, color, config) + config.itemGap;
+                    const l2List = document.createElement('div');
+                    l2List.className = 'mt-10 flex flex-col items-center gap-4 w-full';
+                    
+                    child.children.forEach((subChild, subIndex) => {
+                        const l2Node = document.createElement('div');
+                        l2Node.className = 'node node-level2';
+                        l2Node.textContent = subChild.text;
+                        l2Node.id = `node-l1-${index}-l2-${subIndex}`;
+                        l2List.appendChild(l2Node);
                     });
+                    column.appendChild(l2List);
                 }
+
+                l1Container.appendChild(column);
+            });
+
+            // 等待 DOM 渲染完畢後繪製線條
+            requestAnimationFrame(() => {
+                drawConnectors(data);
             });
         }
 
-        downloadBtn.addEventListener('click', () => {
-            const svgData = new XMLSerializer().serializeToString(svgElement);
-            const canvas = document.getElementById('export-canvas');
-            const ctx = canvas.getContext('2d');
-            
-            const scale = 2; 
-            canvas.width = svgElement.getAttribute('width') * scale;
-            canvas.height = svgElement.getAttribute('height') * scale;
+        function drawConnectors(data) {
+            const rootBox = document.getElementById('root-node').getBoundingClientRect();
+            const containerBox = document.getElementById('captureArea').getBoundingClientRect();
 
-            const img = new Image();
-            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-            const url = URL.createObjectURL(svgBlob);
+            const rootX = (rootBox.left + rootBox.right) / 2 - containerBox.left;
+            const rootY = rootBox.bottom - containerBox.top;
 
-            img.onload = () => {
-                ctx.fillStyle = "white";
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                ctx.scale(scale, scale);
-                ctx.drawImage(img, 0, 0);
-                URL.revokeObjectURL(url);
+            data.children.forEach((child, index) => {
+                const l1El = document.getElementById(`node-l1-${index}`);
+                const l1Box = l1El.getBoundingClientRect();
+                const l1X = (l1Box.left + l1Box.right) / 2 - containerBox.left;
+                const l1Y = l1Box.top - containerBox.top;
 
-                const pngUrl = canvas.toDataURL('image/png');
-                const link = document.createElement('a');
-                link.href = pngUrl;
-                link.download = `學術風垂直架構圖_${new Date().toISOString().slice(0,10)}.png`;
-                link.click();
-            };
-            img.src = url;
-        });
+                // 繪製 Root 到 L1 的曲線
+                const color = colors[index % colors.length];
+                const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
+                
+                // Bezier 曲線路徑
+                const midY = rootY + (l1Y - rootY) * 0.5;
+                const d = `M ${rootX} ${rootY} C ${rootX} ${midY}, ${l1X} ${midY}, ${l1X} ${l1Y}`;
+                
+                path.setAttribute('d', d);
+                path.setAttribute('stroke', color);
+                path.setAttribute('stroke-width', '4');
+                path.setAttribute('fill', 'none');
+                path.setAttribute('stroke-linecap', 'round');
+                svgConnectors.appendChild(path);
 
-        inputTextArea.addEventListener('input', render);
-        window.onload = render;
+                // 繪製 L1 到 L2 的直線
+                let prevY = l1Box.bottom - containerBox.top;
+                child.children.forEach((sub, subIndex) => {
+                    const l2El = document.getElementById(`node-l1-${index}-l2-${subIndex}`);
+                    const l2Box = l2El.getBoundingClientRect();
+                    const l2X = (l2Box.left + l2Box.right) / 2 - containerBox.left;
+                    const l2TopY = l2Box.top - containerBox.top;
+                    const l2BottomY = l2Box.bottom - containerBox.top;
+
+                    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+                    line.setAttribute('x1', l2X);
+                    line.setAttribute('y1', prevY);
+                    line.setAttribute('x2', l2X);
+                    line.setAttribute('y2', l2TopY);
+                    line.setAttribute('stroke', color);
+                    line.setAttribute('stroke-width', '2');
+                    svgConnectors.appendChild(line);
+
+                    prevY = l2BottomY;
+                });
+            });
+        }
+
+        async function downloadImage() {
+            const area = document.getElementById('captureArea');
+            // 為了確保完整捕捉，我們先滾動到最上方
+            const canvas = await html2canvas(area, {
+                backgroundColor: "rgba(255,255,255,0)",
+                scale: 3,
+                logging: false,
+                useCORS: true
+            });
+            const link = document.createElement('a');
+            link.download = '心智圖.png';
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        async function copyImageToClipboard() {
+            try {
+                const area = document.getElementById('captureArea');
+                const canvas = await html2canvas(area, {
+                    // backgroundColor: '#000000',
+                    backgroundColor: "rgba(255,255,255,0)",
+                    scale: 3
+                });
+                
+                canvas.toBlob(async (blob) => {
+                    try {
+                        const data = [new ClipboardItem({ 'image/png': blob })];
+                        await navigator.clipboard.write(data);
+                        showToast();
+                    } catch (err) {
+                        // 回退方案：提醒用戶手動下載
+                        const msg = document.createElement('div');
+                        msg.textContent = "瀏覽器限制，請點擊『下載 PNG』";
+                        msg.className = "bg-red-600 text-white p-2 rounded fixed bottom-4 left-4 z-50";
+                        document.body.appendChild(msg);
+                        setTimeout(() => msg.remove(), 2000);
+                    }
+                });
+            } catch (err) {
+                console.error("複製失敗", err);
+            }
+        }
+
+        function showToast() {
+            const toast = document.getElementById('toast');
+            toast.style.opacity = '1';
+            setTimeout(() => {
+                toast.style.opacity = '0';
+            }, 2000);
+        }
+
+        // 事件監聽
+        textInput.addEventListener('input', renderMindMap);
+        window.addEventListener('resize', renderMindMap);
+
+        // 初始渲染
+        window.onload = renderMindMap;
     </script>
 </body>
 </html>

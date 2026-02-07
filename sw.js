@@ -5,8 +5,16 @@ const ASSETS = [
   './css/style.css',
   './js/mindmap.js',
   './js/html2canvas.min.js',
+  './js/pwa.js',
+  './js/example.js',
+  './js/export.js',
   './manifest.json',
-  './assets/favicon/favicon.png'
+  './assets/favicon/favicon.png',
+  './css/mindmap.css',
+  './css/node-color.css',
+  './css/scroll.css',
+  './css/preview.css',
+
 ];
 
 self.addEventListener('install', (event) => {

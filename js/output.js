@@ -1,4 +1,47 @@
 
+function trimCanvas(canvas) {
+    const ctx = canvas.getContext('2d');
+    const width = canvas.width;
+    const height = canvas.height;
+    const pixels = ctx.getImageData(0, 0, width, height);
+    const data = pixels.data;
+    let minX = width, minY = height, maxX = 0, maxY = 0;
+
+    for (let y = 0; y < height; y++) {
+        for (let x = 0; x < width; x++) {
+            const alpha = data[(y * width + x) * 4 + 3];
+            if (alpha > 0) {
+                if (x < minX) minX = x;
+                if (y < minY) minY = y;
+                if (x > maxX) maxX = x;
+                if (y > maxY) maxY = y;
+            }
+        }
+    }
+
+    if (maxX < minX || maxY < minY) {
+        return canvas; // Empty canvas
+    }
+
+    // Add 10px padding if possible
+    const padding = 10;
+    minX = Math.max(0, minX - padding);
+    minY = Math.max(0, minY - padding);
+    maxX = Math.min(width, maxX + padding);
+    maxY = Math.min(height, maxY + padding);
+
+    const trimmedWidth = maxX - minX;
+    const trimmedHeight = maxY - minY;
+
+    const trimmedCanvas = document.createElement('canvas');
+    trimmedCanvas.width = trimmedWidth;
+    trimmedCanvas.height = trimmedHeight;
+    const trimmedCtx = trimmedCanvas.getContext('2d');
+    trimmedCtx.drawImage(canvas, minX, minY, trimmedWidth, trimmedHeight, 0, 0, trimmedWidth, trimmedHeight);
+
+    return trimmedCanvas;
+}
+
 async function downloadImage() {
     const area = document.getElementById('captureArea');
     // 為了確保完整捕捉，我們先滾動到最上方
@@ -8,6 +51,8 @@ async function downloadImage() {
         logging: false,
         useCORS: true
     });
+
+    const trimmedCanvas = trimCanvas(canvas);
 
     // 取得檔名：輸入文字第一行 + YYYYMMDD-HHmmSS
     const textInput = document.getElementById('textInput');
@@ -26,9 +71,10 @@ async function downloadImage() {
         String(now.getMinutes()).padStart(2, '0') +
         String(now.getSeconds()).padStart(2, '0');
 
+
     const link = document.createElement('a');
     link.download = `${firstLine}-${timestamp}.png`;
-    link.href = canvas.toDataURL('image/png');
+    link.href = trimmedCanvas.toDataURL('image/png');
     link.click();
 }
 
@@ -40,8 +86,10 @@ async function copyImageToClipboard() {
             backgroundColor: "rgba(255,255,255,0)",
             scale: 2
         });
-        
-        canvas.toBlob(async (blob) => {
+
+        const trimmedCanvas = trimCanvas(canvas);
+
+        trimmedCanvas.toBlob(async (blob) => {
             try {
                 const data = [new ClipboardItem({ 'image/png': blob })];
                 await navigator.clipboard.write(data);

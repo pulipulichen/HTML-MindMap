@@ -39,14 +39,34 @@ body {
     border-color: #cbd5e1;
 }
 
+#captureArea .node-root {
+    padding-top: 12px !important;
+}
+
+#captureAreaOutput .node-root {
+    position: relative;
+    top: 12px;
+}
+
 .node-level1 {
     border-width: 3px;
     font-size: 1.1rem;
 }
 
-#renderRoot .node-level1 {
+#captureArea .node-level1 {
     padding-top: 12px !important;
 }
+
+#captureAreaOutput .node-level1 {
+    position: relative;
+    top: 12px;
+}
+
+#captureAreaOutput .node-level2 {
+    position: relative;
+    top: 20px;
+}
+
 
 .node-level2 {
     background: transparent;

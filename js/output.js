@@ -46,8 +46,11 @@ function trimCanvas(canvas) {
 
 async function downloadImage() {
     const area = document.getElementById('captureArea');
+
+    const captureAreaOutput = document.getElementById('captureAreaOutput');
+    captureAreaOutput.innerHTML = area.innerHTML;
     // 為了確保完整捕捉，我們先滾動到最上方
-    const canvas = await html2canvas(area, {
+    const canvas = await html2canvas(captureAreaOutput, {
         backgroundColor: null,
         scale: 2,
         logging: false,
@@ -55,6 +58,7 @@ async function downloadImage() {
     });
 
     const trimmedCanvas = trimCanvas(canvas);
+    captureAreaOutput.innerHTML = '';
 
     // 取得檔名：輸入文字第一行 + YYYYMMDD-HHmmSS
     const textInput = document.getElementById('textInput');
@@ -83,13 +87,18 @@ async function downloadImage() {
 async function copyImageToClipboard() {
     try {
         const area = document.getElementById('captureArea');
-        const canvas = await html2canvas(area, {
+
+        const captureAreaOutput = document.getElementById('captureAreaOutput');
+        captureAreaOutput.innerHTML = area.innerHTML;
+
+        const canvas = await html2canvas(captureAreaOutput, {
             // backgroundColor: '#000000',
             backgroundColor: null,
             scale: 2
         });
 
         const trimmedCanvas = trimCanvas(canvas);
+        captureAreaOutput.innerHTML = '';
 
         trimmedCanvas.toBlob(async (blob) => {
             try {
@@ -132,7 +141,10 @@ async function updatePreview() {
             previewStatus.classList.add('bg-yellow-400');
 
             const area = document.getElementById('captureArea');
-            const canvas = await html2canvas(area, {
+            const captureAreaOutput = document.getElementById('captureAreaOutput');
+            captureAreaOutput.innerHTML = area.innerHTML;
+
+            const canvas = await html2canvas(captureAreaOutput, {
                 backgroundColor: null,
                 scale: 1, // 預覽用 1 倍即可，兼顧效能
                 logging: false,
@@ -140,6 +152,7 @@ async function updatePreview() {
             });
 
             const trimmedCanvas = trimCanvas(canvas);
+            captureAreaOutput.innerHTML = '';
 
             // 更新預覽顯示
             previewOutput.innerHTML = '';

@@ -31,7 +31,6 @@ function trimCanvas(canvas) {
     maxX = Math.min(width, maxX + paddingX);
     maxY = Math.min(height, maxY + paddingY);
 
-    console.log({ minX, minY, maxX, maxY })
 
     const trimmedWidth = maxX - minX;
     const trimmedHeight = maxY - minY;
@@ -49,7 +48,7 @@ async function downloadImage() {
     const area = document.getElementById('captureArea');
     // 為了確保完整捕捉，我們先滾動到最上方
     const canvas = await html2canvas(area, {
-        backgroundColor: "rgba(255,255,255,0)",
+        backgroundColor: null,
         scale: 2,
         logging: false,
         useCORS: true
@@ -86,7 +85,7 @@ async function copyImageToClipboard() {
         const area = document.getElementById('captureArea');
         const canvas = await html2canvas(area, {
             // backgroundColor: '#000000',
-            backgroundColor: "rgba(255,255,255,0)",
+            backgroundColor: null,
             scale: 2
         });
 

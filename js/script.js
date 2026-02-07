@@ -13,7 +13,7 @@ function parseText(text) {
     for (let i = 1; i < lines.length; i++) {
         const line = lines[i];
         const content = line.trim().substring(2).replace(/\\n/g, '\n');
-        
+
         if (line.startsWith('- ')) {
             currentLevel1 = { text: content, children: [], id: `l1-${root.children.length}` };
             root.children.push(currentLevel1);
@@ -49,7 +49,7 @@ function renderMindMap() {
     data.children.forEach((child, index) => {
         const column = document.createElement('div');
         column.className = 'flex flex-col items-center flex-1 max-w-[250px]';
-        
+
         // L1 Node
         const l1Node = document.createElement('div');
         l1Node.className = `node node-level1 color-${index % 4}`;
@@ -61,7 +61,7 @@ function renderMindMap() {
         if (child.children.length > 0) {
             const l2List = document.createElement('div');
             l2List.className = 'mt-10 flex flex-col items-center gap-4 w-full';
-            
+
             child.children.forEach((subChild, subIndex) => {
                 const l2Node = document.createElement('div');
                 l2Node.className = 'node node-level2';
@@ -97,11 +97,11 @@ function drawConnectors(data) {
         // 繪製 Root 到 L1 的曲線
         const color = colors[index % colors.length];
         const path = document.createElementNS('http://www.w3.org/2000/svg', 'path');
-        
+
         // Bezier 曲線路徑
         const midY = rootY + (l1Y - rootY) * 0.5;
         const d = `M ${rootX} ${rootY} C ${rootX} ${midY}, ${l1X} ${midY}, ${l1X} ${l1Y}`;
-        
+
         path.setAttribute('d', d);
         path.setAttribute('stroke', color);
         path.setAttribute('stroke-width', '4');
@@ -130,57 +130,6 @@ function drawConnectors(data) {
             prevY = l2BottomY;
         });
     });
-}
-
-async function downloadImage() {
-    const area = document.getElementById('captureArea');
-    // 為了確保完整捕捉，我們先滾動到最上方
-    const canvas = await html2canvas(area, {
-        backgroundColor: "rgba(255,255,255,0)",
-        scale: 3,
-        logging: false,
-        useCORS: true
-    });
-    const link = document.createElement('a');
-    link.download = '心智圖.png';
-    link.href = canvas.toDataURL('image/png');
-    link.click();
-}
-
-async function copyImageToClipboard() {
-    try {
-        const area = document.getElementById('captureArea');
-        const canvas = await html2canvas(area, {
-            // backgroundColor: '#000000',
-            backgroundColor: "rgba(255,255,255,0)",
-            scale: 3
-        });
-        
-        canvas.toBlob(async (blob) => {
-            try {
-                const data = [new ClipboardItem({ 'image/png': blob })];
-                await navigator.clipboard.write(data);
-                showToast();
-            } catch (err) {
-                // 回退方案：提醒用戶手動下載
-                const msg = document.createElement('div');
-                msg.textContent = "瀏覽器限制，請點擊『下載 PNG』";
-                msg.className = "bg-red-600 text-white p-2 rounded fixed bottom-4 left-4 z-50";
-                document.body.appendChild(msg);
-                setTimeout(() => msg.remove(), 2000);
-            }
-        });
-    } catch (err) {
-        console.error("複製失敗", err);
-    }
-}
-
-function showToast() {
-    const toast = document.getElementById('toast');
-    toast.style.opacity = '1';
-    setTimeout(() => {
-        toast.style.opacity = '0';
-    }, 2000);
 }
 
 // 事件監聽

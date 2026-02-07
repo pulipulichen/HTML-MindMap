@@ -1,13 +1,13 @@
 const CACHE_NAME = 'mindmap-v1-20260207-2021';
-// const ASSETS = [
-//   './',
-//   './index.html',
-//   './css/style.css',
-//   './js/script.js',
-//   './js/html2canvas.min.js',
-//   './manifest.json',
-//   './assets/favicon/favicon.png'
-// ];
+const ASSETS = [
+  './',
+  './index.html',
+  './css/style.css',
+  './js/mindmap.js',
+  './js/html2canvas.min.js',
+  './manifest.json',
+  './assets/favicon/favicon.png'
+];
 
 self.addEventListener('install', (event) => {
   event.waitUntil(

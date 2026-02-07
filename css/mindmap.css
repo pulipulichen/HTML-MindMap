@@ -1,3 +1,8 @@
+#captureArea,
+#captureAreaOutput {
+    width: fit-content;
+}
+
 .mindmap-container {
     /* background-color: #FFFFFF; */
     min-height: 600px;
@@ -6,6 +11,7 @@
     display: flex;
     flex-direction: column;
     align-items: center;
+    white-space: nowrap;
 }
 
 .node {
@@ -22,12 +28,20 @@
     white-space: pre-wrap;
     line-height: 1.4;
     padding-top: 0px !important;
+
 }
 
 .node-root {
     font-size: 2rem;
     padding: 20px 40px;
+    border-width: 4px;
     border-color: #cbd5e1;
+}
+
+
+.node-level1 {
+    border-width: 3px;
+    font-size: 1.1rem;
 }
 
 #captureArea .node-root {
@@ -35,13 +49,10 @@
 }
 
 #captureAreaOutput .node-root {
-    position: relative;
-    top: 12px;
-}
+    /* position: relative; */
+    /* top: 10px; */
+    padding-bottom: 30px !important;
 
-.node-level1 {
-    border-width: 3px;
-    font-size: 1.1rem;
 }
 
 #captureArea .node-level1 {
@@ -49,13 +60,17 @@
 }
 
 #captureAreaOutput .node-level1 {
-    position: relative;
-    top: 12px;
+    /* position: relative;
+    top: 12px; */
+    margin-top: 5px !important;
+    padding-bottom: 20px !important;
 }
 
 #captureAreaOutput .node-level2 {
-    position: relative;
-    top: 20px;
+    /* position: relative;
+    top: 20px; */
+    /* padding-bottom: 10px !important; */
+    margin-top: -2px !important;
 }
 
 

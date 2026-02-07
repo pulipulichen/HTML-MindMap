@@ -4,5 +4,6 @@ body {
     font-family: 'Noto Sans TC', sans-serif;
     background-color: #1a1a1a;
     color: white;
-    overflow-x: hidden;
+    /* overflow-x: hidden; */
+    overflow: auto;
 }

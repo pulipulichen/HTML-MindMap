@@ -58,7 +58,7 @@ async function downloadImage() {
     });
 
     const trimmedCanvas = trimCanvas(canvas);
-    captureAreaOutput.innerHTML = '';
+
 
     // 取得檔名：輸入文字第一行 + YYYYMMDD-HHmmSS
     const textInput = document.getElementById('textInput');
@@ -81,6 +81,7 @@ async function downloadImage() {
     const link = document.createElement('a');
     link.download = `${firstLine}-${timestamp}.png`;
     link.href = trimmedCanvas.toDataURL('image/png');
+    captureAreaOutput.innerHTML = '';
     link.click();
 }
 
@@ -98,7 +99,7 @@ async function copyImageToClipboard() {
         });
 
         const trimmedCanvas = trimCanvas(canvas);
-        captureAreaOutput.innerHTML = '';
+
 
         trimmedCanvas.toBlob(async (blob) => {
             try {
@@ -113,6 +114,8 @@ async function copyImageToClipboard() {
                 document.body.appendChild(msg);
                 setTimeout(() => msg.remove(), 2000);
             }
+
+            captureAreaOutput.innerHTML = '';
         });
     } catch (err) {
         console.error("複製失敗", err);
@@ -152,7 +155,7 @@ async function updatePreview() {
             });
 
             const trimmedCanvas = trimCanvas(canvas);
-            captureAreaOutput.innerHTML = '';
+
 
             // 更新預覽顯示
             previewOutput.innerHTML = '';
@@ -163,6 +166,7 @@ async function updatePreview() {
 
             previewStatus.classList.remove('bg-yellow-400');
             previewStatus.classList.add('bg-green-400');
+            captureAreaOutput.innerHTML = '';
         } catch (err) {
             console.error("預覽生成失敗", err);
             previewStatus.classList.remove('bg-yellow-400', 'bg-green-400');

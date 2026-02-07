@@ -14,6 +14,9 @@ async function loadExample() {
         const text = await response.text();
         textInput.value = text;
         renderMindMap();
+        if (typeof saveToLocalStorage === 'function') {
+            saveToLocalStorage();
+        }
     } catch (err) {
         console.error("載入範例失敗", err);
         alert("載入範例失敗：" + err.message);

@@ -1,0 +1,7 @@
+{
+    "name": "html-mindmap",
+    "version": "1.0.0",
+    "scripts": {
+        "start": "sudo docker compose up --build --exit-code-from test-runner"
+    }
+}

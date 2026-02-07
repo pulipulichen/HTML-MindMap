@@ -1,0 +1,16 @@
+{
+  "name": "垂直心智圖產生器",
+  "short_name": "心智圖產生器",
+  "start_url": ".",
+  "display": "standalone",
+  "theme_color": "#1a1a1a",
+  "background_color": "#1a1a1a",
+  "description": "一個簡單快速的垂直心智圖產生工具，支援多層級結構與匯出圖片。",
+  "icons": [
+    {
+      "src": "assets/favicon/favicon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

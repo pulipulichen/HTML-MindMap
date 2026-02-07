@@ -1,7 +1,7 @@
 services:
   test-runner:
     build:
-      context: .
+      context: e2e
       dockerfile: Dockerfile.test
     volumes:
       - .:/app

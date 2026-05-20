@@ -137,6 +137,9 @@ function drawConnectors(data) {
 
 // 事件監聽
 textInput.addEventListener('input', () => {
+    if (textInput.dataset.defaultContentLanguage) {
+        delete textInput.dataset.defaultContentLanguage;
+    }
     renderMindMap();
     saveToLocalStorage();
     if (typeof updatePreview === 'function') {
@@ -159,14 +162,24 @@ function loadFromLocalStorage() {
     const savedContent = localStorage.getItem('mindmap_content');
     if (savedContent !== null) {
         textInput.value = savedContent;
+        if (textInput.dataset.defaultContentLanguage) {
+            delete textInput.dataset.defaultContentLanguage;
+        }
     }
 }
 
+document.addEventListener('languagechange', () => {
+    renderMindMap();
+    if (typeof updatePreview === 'function') {
+        updatePreview();
+    }
+});
+
 // 初始渲染
-window.onload = () => {
+window.addEventListener('load', () => {
     loadFromLocalStorage();
     renderMindMap();
     if (typeof updatePreview === 'function') {
         updatePreview();
     }
-};
+});

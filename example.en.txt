@@ -1,0 +1,13 @@
+Interview Analysis
+- Implementation:\nInterview Transcription
+  - Preparation
+  - Start Transcription
+  - Finish Transcription
+- Data Analysis\nwith RAG
+  - Speech-to-text limitations
+  - Retrieval-Augmented Generation
+  - Google\nNotebookLM
+- Implementation:\nAnalyze Interviews with RAG
+  - Create notebook
+  - Prompt design
+  - Review analysis output

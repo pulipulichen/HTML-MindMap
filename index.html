@@ -1,11 +1,12 @@
 <!DOCTYPE html>
-<html lang="zh-TW">
+<html lang="en">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>垂直心智圖產生器</title>
-    <meta name="description" content="一個簡單快速的垂直心智圖產生工具，支援多層級結構與匯出圖片。">
+    <title data-i18n="app.title">Vertical Mind Map Generator</title>
+    <meta id="metaDescription" name="description"
+        content="A simple and fast vertical mind map tool with multi-level structure and PNG export.">
     <meta name="theme-color" content="#1a1a1a">
 
     <!-- PWA -->
@@ -27,7 +28,8 @@
 
     <!-- 左側編輯區 -->
     <div class="w-full md:w-1/3 bg-neutral-900 p-6 flex flex-col border-r border-neutral-800">
-        <h1 class="text-xl font-bold mb-4 flex items-center gap-2">
+        <div class="mb-4 flex items-center justify-between gap-3">
+            <h1 class="text-xl font-bold flex items-center gap-2">
             <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none"
                 stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                 <path d="M9 12h6" />
@@ -35,25 +37,24 @@
                 <path d="M12 3v18" />
                 <path d="M3 12h18" />
             </svg>
-            垂直心智圖產生器
-        </h1>
+            <span data-i18n="app.title">Vertical Mind Map Generator</span>
+            </h1>
 
-        <p class="text-xs text-neutral-400 mb-2">請依照下列格式輸入（支援 \n 換行）：</p>
+            <label for="language-select" class="flex items-center gap-2 text-sm text-neutral-300">
+                <span data-i18n="language.label">Language</span>
+                <select id="language-select"
+                    class="bg-neutral-800 border border-neutral-700 rounded px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500">
+                    <option value="en" data-i18n="language.option.en">English</option>
+                    <option value="zh-TW" data-i18n="language.option.zh-TW">繁體中文</option>
+                </select>
+            </label>
+        </div>
+
+        <p class="text-xs text-neutral-400 mb-2" data-i18n="ui.inputHint">Please follow the format below (supports \n
+            line breaks):</p>
         <textarea id="textInput"
             class="flex-1 bg-neutral-800 border border-neutral-700 rounded-lg p-4 font-mono text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 scroll-custom"
-            spellcheck="false">訪談分析
-- 實作：\n訪談轉錄
-  - 訪談準備
-  - 開啟轉錄
-  - 完成轉錄
-- 資料分析\n與RAG
-  - 語音轉錄的限制
-  - 檢索增強生成RAG
-  - Google\nNotebookLM
-- 實作：\n用RAG分析訪談
-  - 建立筆記本
-  - 訪談分析提示詞
-  - 觀察分析結果</textarea>
+            spellcheck="false"></textarea>
 
         <div class="mt-4 flex flex-col gap-2">
             <button onclick="loadExample()"
@@ -66,7 +67,7 @@
                     <line x1="16" y1="17" x2="8" y2="17" />
                     <polyline points="10 9 9 9 8 9" />
                 </svg>
-                載入範例
+                <span data-i18n="buttons.loadExample">Load Example</span>
             </button>
             <div class="flex gap-2">
                 <button onclick="downloadImage()"
@@ -77,7 +78,7 @@
                         <polyline points="7 10 12 15 17 10" />
                         <line x1="12" y1="15" x2="12" y2="3" />
                     </svg>
-                    下載 PNG
+                    <span data-i18n="buttons.downloadPng">Download PNG</span>
                 </button>
                 <button id="copyBtn" onclick="copyImageToClipboard()"
                     class="flex-1 bg-neutral-700 hover:bg-neutral-600 text-white py-2 px-4 rounded-lg flex items-center justify-center gap-2 transition-colors">
@@ -86,13 +87,14 @@
                         <rect width="14" height="14" x="8" y="8" rx="2" ry="2" />
                         <path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2" />
                     </svg>
-                    複製圖片
+                    <span data-i18n="buttons.copyImage">Copy Image</span>
                 </button>
             </div>
         </div>
         <div id="toast"
             class="fixed bottom-4 left-4 bg-green-600 text-white px-4 py-2 rounded shadow-lg opacity-0 transition-opacity pointer-events-none">
-            已複製到剪貼簿！</div>
+            <span data-i18n="toast.copySuccess">Copied to clipboard!</span>
+        </div>
     </div>
 
     <!-- 右側預覽區 -->
@@ -101,11 +103,11 @@
         <div id="previewContainer"
             class="fixed top-4 right-4 z-50 w-64 border-2 border-blue-500 rounded-lg shadow-2xl bg-white overflow-hidden pointer-events-none transition-all duration-300 opacity-0 group-hover:opacity-100">
             <div class="bg-blue-500 text-white text-[10px] px-2 py-1 flex justify-between items-center">
-                <span>即時預覽 (Canvas)</span>
+                <span data-i18n="preview.title">Live Preview (Canvas)</span>
                 <span id="previewStatus" class="w-2 h-2 rounded-full bg-green-400"></span>
             </div>
             <div id="previewOutput" class="p-1 flex items-center justify-center bg-gray-50 min-h-[100px]">
-                <span class="text-gray-400 text-[10px]">正在生成預覽...</span>
+                <span class="text-gray-400 text-[10px]" data-i18n="preview.generating">Generating preview...</span>
             </div>
         </div>
 
@@ -120,6 +122,9 @@
     </div>
 
     <script src="js/html2canvas.min.js"></script>
+    <script src="js/modules/i18n/en.js"></script>
+    <script src="js/modules/i18n/zh-TW.js"></script>
+    <script src="js/i18n.js"></script>
     <script src="js/mindmap.js"></script>
     <script src="js/pwa.js"></script>
     <script src="js/export.js"></script>

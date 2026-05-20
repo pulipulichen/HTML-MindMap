@@ -62,7 +62,7 @@ async function downloadImage() {
 
     // 取得檔名：輸入文字第一行 + YYYYMMDD-HHmmSS
     const textInput = document.getElementById('textInput');
-    let firstLine = '心智圖';
+    let firstLine = typeof window.t === 'function' ? window.t('export.defaultFilename') : 'MindMap';
     if (textInput && textInput.value.trim()) {
         firstLine = textInput.value.trim().split('\n')[0].substring(0, 50).trim();
         // 過濾掉檔案系統不允許的字元
@@ -109,7 +109,11 @@ async function copyImageToClipboard() {
             } catch (err) {
                 // 回退方案：提醒用戶手動下載
                 const msg = document.createElement('div');
-                msg.textContent = "瀏覽器限制，請點擊『下載 PNG』";
+                let warningText = "Browser limitation detected, please click 'Download PNG'.";
+                if (typeof window.t === 'function') {
+                    warningText = window.t('errors.browserClipboardLimit');
+                }
+                msg.textContent = warningText;
                 msg.className = "bg-red-600 text-white p-2 rounded fixed bottom-4 left-4 z-50";
                 document.body.appendChild(msg);
                 setTimeout(() => msg.remove(), 2000);
@@ -118,7 +122,7 @@ async function copyImageToClipboard() {
             captureAreaOutput.innerHTML = '';
         });
     } catch (err) {
-        console.error("複製失敗", err);
+        console.error(typeof window.t === 'function' ? window.t('errors.copyFailed') : 'Failed to copy image', err);
     }
 }
 
@@ -168,7 +172,7 @@ async function updatePreview() {
             previewStatus.classList.add('bg-green-400');
             captureAreaOutput.innerHTML = '';
         } catch (err) {
-            console.error("預覽生成失敗", err);
+            console.error(typeof window.t === 'function' ? window.t('errors.previewFailed') : 'Failed to generate preview', err);
             previewStatus.classList.remove('bg-yellow-400', 'bg-green-400');
             previewStatus.classList.add('bg-red-400');
         }

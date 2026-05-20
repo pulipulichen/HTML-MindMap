@@ -1,15 +1,28 @@
 
 async function loadExample() {
     if (textInput.value.trim() !== "") {
-        if (!window.confirm("這將會覆蓋您目前的內容，確定要載入範例嗎？")) {
+        let confirmMessage = 'This will overwrite your current content. Continue loading the example?';
+        if (typeof window.t === 'function') {
+            confirmMessage = window.t('dialogs.loadExampleConfirm');
+        }
+        if (!window.confirm(confirmMessage)) {
             return;
         }
     }
 
     try {
-        const response = await fetch('example.txt');
+        let language = 'en';
+        if (window.i18n && typeof window.i18n.getCurrentLanguage === 'function') {
+            language = window.i18n.getCurrentLanguage();
+        }
+        const exampleFile = language === 'zh-TW' ? 'example.txt' : 'example.en.txt';
+        const response = await fetch(exampleFile);
         if (!response.ok) {
-            throw new Error('無法讀取範例檔案');
+            let message = 'Unable to read the example file.';
+            if (typeof window.t === 'function') {
+                message = window.t('errors.loadExampleFile');
+            }
+            throw new Error(message);
         }
         const text = await response.text();
         textInput.value = text;
@@ -18,7 +31,11 @@ async function loadExample() {
             saveToLocalStorage();
         }
     } catch (err) {
-        console.error("載入範例失敗", err);
-        alert("載入範例失敗：" + err.message);
+        let prefix = `Failed to load example: ${err.message}`;
+        if (typeof window.t === 'function') {
+            prefix = window.t('errors.loadExamplePrefix', { message: err.message });
+        }
+        console.error(prefix, err);
+        alert(prefix);
     }
 }
